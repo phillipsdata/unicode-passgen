@@ -1,0 +1,37 @@
+{
+  "name": "password-generator",
+  "version": "0.1.0",
+  "description": "A JavaScript library for generating passwords from the Unicode BMP character set.",
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "dependencies": {
+    "chai": "^4.1.2",
+    "regenerate": "^1.3.3"
+  },
+  "devDependencies": {
+    "mocha": "^5.0.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://tysonphillips@github.com/phillipsdata/password-generator.git"
+  },
+  "keywords": [
+    "password",
+    "generator",
+    "javascript",
+    "unicode",
+    "browser"
+  ],
+  "author": "Phillips Data, Inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/phillipsdata/password-generator/issues"
+  },
+  "homepage": "https://github.com/phillipsdata/password-generator#readme"
+}
