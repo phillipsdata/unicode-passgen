@@ -1,15 +1,25 @@
-var regenerate = require('regenerate');
-
 /**
  * Password Generator
- * License: MIT
+ * https://github.com/phillipsdata/password-generator
+ * Copyright (c) 2018 Phillips Data, Inc.
+ * MIT License
  */
-(function() {
+;(function() {
   'use strict';
 
-  var root = this;
-  var prevModule = root.passwordGenerator;
+  // Setup the root object--'window', 'global', or 'this'
+  var root = typeof self == 'object' && self.self === self && self ||
+    typeof global == 'object' && global.global === global && global ||
+    this ||
+    {};
+  var previousPasswordGenerator = root.passwordGenerator;
   var passwordGenerator = {};
+
+  // Be sure our dependencies exist
+  var regenerate = root.regenerate || (typeof require !== undefined) && require('regenerate');
+  if (!regenerate) {
+    throw new Error('passwordGenerator requires regenerate, see https://github.com/mathiasbynens/regenerate');
+  }
 
   /**
     * Generates a string of the given length that include characters as defined
@@ -70,7 +80,7 @@ var regenerate = require('regenerate');
    * @returns {Object}
    */
   passwordGenerator.noConflict = function() {
-    root.passwordGenerator = prevModule;
+    root.passwordGenerator = previousPasswordGenerator;
     return passwordGenerator;
   };
 
@@ -343,8 +353,12 @@ var regenerate = require('regenerate');
   }
 
   // Setup module for node/browser
-  if (typeof module !== undefined && module.exports) {
-    module.exports = passwordGenerator;
+  if (typeof exports !== undefined) {
+    if (typeof module !== undefined && module.exports) {
+      module.exports = passwordGenerator;
+    }
+
+    exports.passwordGenerator = passwordGenerator;
   } else {
     root.passwordGenerator = passwordGenerator;
   }

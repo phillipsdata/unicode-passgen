@@ -9,10 +9,10 @@
   },
   "dependencies": {
     "chai": "^4.1.2",
-    "jshint": "^2.9.5",
     "regenerate": "^1.3.3"
   },
   "devDependencies": {
+    "jshint": "^2.9.5",
     "mocha": "^5.0.1"
   },
   "scripts": {
@@ -24,6 +24,10 @@
     "url": "git+https://tysonphillips@github.com/phillipsdata/password-generator.git"
   },
   "keywords": [
+    "password generator",
+    "generate password",
+    "random string",
+    "random generator",
     "password",
     "generator",
     "javascript",

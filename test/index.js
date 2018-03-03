@@ -10,7 +10,8 @@ describe('#generate', function() {
     var options = {include: [{chars: [[0x41, 0x44]]}]};
 
     for (var length in lengths) {
-      generator.generate(lengths[length], options).should.lengthOf(lengths[length]);
+      generator.generate(lengths[length], options)
+        .should.lengthOf(lengths[length]);
     }
   });
 
@@ -33,7 +34,9 @@ describe('#generate', function() {
       value.should.lengthOf(Math.max(lengths[length], 7));
 
       // The value *must* contain at least 2 of the characters and 5 digits
-      expect(value).to.match(/(?=.*[abcd]).{2,}/).to.match(/(?=.*[0-3,5,7]).{5,}/);
+      expect(value)
+        .to.match(/(?=.*[abcd]).{2,}/)
+        .to.match(/(?=.*[0-3,5,7]).{5,}/);
     }
   });
 
@@ -63,6 +66,33 @@ describe('#generate', function() {
       .to.match(/(?=.*[\u1709]).{1}/) // ᜉ, (0x1709) Tagalog
       .to.match(/(?=.*[\u2827]).{1}/) // ⠧, (0x2827) Braille
       .to.match(/(?=.*[\u30B8]).{1}/); // ジ, (0x30B8) Katakana
+  });
+
+  it('fails to generate with characters outside of the BMP unicode range', function() {
+    var options = {
+      include: [
+        {chars: [[0x10000]], min: 1}, // beginning of plane 1
+        {chars: [[0x20000]], min: 1}, // beginning of plane 2
+        {chars: [[0x30000]], min: 1}, // beginning of plane 3 - 13
+        {chars: [[0xE0000]], min: 1}, // beginning of plane 14
+        {chars: [[0xF0000]], min: 1}, // beginning of plane 15 - 16
+        {chars: [[0x1F4A9]], min: 1} // poo
+      ]
+    };
+
+    var value = generator.generate(8, options);
+    value.should.lengthOf(8);
+
+    // Characters in the astral planes should not be found in the result set
+    // since they are currently not supported
+    expect(value)
+      .to.not
+      .match(/(?=.*[\u10000]).{1}/) // beginning of plane 1
+      .match(/(?=.*[\u20000]).{1}/) // beginning of plane 2
+      .match(/(?=.*[\u30000]).{1}/) // beginning of plane 3 - 13
+      .match(/(?=.*[\uE0000]).{1}/) // beginning of plane 14
+      .match(/(?=.*[\uF0000]).{1}/) // beginning of plane 15 - 16
+      .match(/(?=.*[\u1F4A9]).{1}/); // poo
   });
 
   it('RangeError thrown when given negative length', function() {
