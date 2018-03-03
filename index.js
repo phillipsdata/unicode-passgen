@@ -1,12 +1,78 @@
-
 var regenerate = require('regenerate');
 
 /**
  * Password Generator
  * License: MIT
  */
-(function(root) {
+(function() {
   'use strict';
+
+  var root = this;
+  var prevModule = root.passwordGenerator;
+  var passwordGenerator = {};
+
+  /**
+    * Generates a string of the given length that include characters as defined
+    * by the given options.
+    *
+    * @param {Integer} length The length of the string to generate
+    * @param {Object} options An Object containing:
+    *  - include (optional) - An Object containing an Array of Objects, each of which contain:
+    *    - chars - An Array containing an Array of 1 character per index:
+    *      - 0 - A single character, hex character, or unicode character.
+    *        This may be a single character to include, or the beginning of a
+    *        range of characters to include
+    *      - 1 - A single character, hex character, or unicode character.
+    *        This must be the end of the range of the characters to include.
+    *    - min (optional) - An Integer representing the minimum number of
+    *      characters from the 'chars' set that *must* be included in the generated
+    *      string
+    *  - exclude (optional) - An Object containing an Array of Objects, each of which contain:
+    *    - chars - An Array containing an Array of 1 character per index:
+    *      - 0 - A single character, hex character, or unicode character.
+    *        This may be a single character to exclude, or the beginning of a
+    *        range of characters to exclude
+    *      - 1 - A single character, hex character, or unicode character.
+    *        This must be the end of the range of the characters to exclude.
+    * @returns {String} A random generated string
+    */
+  passwordGenerator.generate = function(length, options) {
+    if (!isInt(length)) {
+      throw new TypeError('Non-integer length type');
+    } else if (length < 0) {
+      throw new RangeError('Length must be a positive integer');
+    }
+
+    var opts = getOptions(options);
+    var allCharacters = getCharacterList(opts);
+
+    // Return no password if we have no data set to generate it from
+    var value = '';
+    if (allCharacters.length <= 0) {
+      return value;
+    }
+
+    // Generate random characters for the required minimum number of values
+    var characterSets = getCharacterSets(opts);
+    for (var i in characterSets) {
+      value += generateString(characterSets[i].set, characterSets[i].min);
+    }
+
+    // Generate random characters for the remainder of the length
+    value += generateString(allCharacters, (length - value.length));
+
+    return shuffle(value);
+  };
+
+  /**
+   * Avoid conflicts with module name
+   *
+   * @returns {Object}
+   */
+  passwordGenerator.noConflict = function() {
+    root.passwordGenerator = prevModule;
+    return passwordGenerator;
+  };
 
   /**
    * Creates a set of options for the generator from the given options
@@ -46,22 +112,22 @@ var regenerate = require('regenerate');
 
       // Merge the options given
       for (var set in options[property]) {
-        if (typeof options[property][set] === 'object'
-          && options[property][set].hasOwnProperty('chars')
-          && Array.isArray(options[property][set]['chars'])
+        if (typeof options[property][set] === 'object' &&
+          options[property][set].hasOwnProperty('chars') &&
+          Array.isArray(options[property][set].chars)
         ) {
           // Add the character set to the options
           var charSet = {
-            chars: options[property][set]['chars'],
+            chars: options[property][set].chars,
             min: 0
           };
 
           // Set the minimum value if given
-          if (options[property][set].hasOwnProperty('min')
-            && isInt(options[property][set]['min'])
-            && options[property][set]['min'] > 0
+          if (options[property][set].hasOwnProperty('min') &&
+            isInt(options[property][set].min) &&
+            options[property][set].min > 0
           ) {
-            charSet.min = options[property][set]['min'];
+            charSet.min = options[property][set].min;
           }
 
           opts[property].push(charSet);
@@ -119,13 +185,13 @@ var regenerate = require('regenerate');
     var include = options.include;
 
     for (var i in include) {
-      for (var j in include[i]['chars']) {
+      for (var j in include[i].chars) {
         // There should always be a 0th-index element
-        if (include[i]['chars'][j][0] === undefined) {
+        if (include[i].chars[j][0] === undefined) {
           continue;
         }
 
-        regen = addCharacters(regen, include[i]['chars'][j]);
+        regen = addCharacters(regen, include[i].chars[j]);
       }
     }
 
@@ -168,14 +234,14 @@ var regenerate = require('regenerate');
     for (var i in include) {
       regen = regenerate();
 
-      for (var j in include[i]['chars']) {
+      for (var j in include[i].chars) {
         // There should always be a 0th-index element
-        if (include[i]['chars'][j][0] === undefined) {
+        if (include[i].chars[j][0] === undefined) {
           continue;
         }
 
         // Add the characters from the set
-        regen = addCharacters(regen, include[i]['chars'][j]);
+        regen = addCharacters(regen, include[i].chars[j]);
       }
 
       // Remove the characters from the exclusion set
@@ -184,7 +250,7 @@ var regenerate = require('regenerate');
       sets.push(
         {
           set: regen.valueOf(),
-          min: include[i]['min']
+          min: include[i].min
         }
       );
     }
@@ -222,17 +288,17 @@ var regenerate = require('regenerate');
   function removeCharacters(regen, set) {
     // Remove characters provided
     for (var i in set) {
-      for (var j in set[i]['chars']) {
+      for (var j in set[i].chars) {
         // There should always be a 0th-index element
-        if (set[i]['chars'][j][0] === undefined) {
+        if (set[i].chars[j][0] === undefined) {
           continue;
         }
 
         // Remove the character range, or a single character itself, from the set
-        if (set[i]['chars'][j][1] !== undefined) {
-          regen.removeRange(set[i]['chars'][j][0], set[i]['chars'][j][1]);
+        if (set[i].chars[j][1] !== undefined) {
+          regen.removeRange(set[i].chars[j][0], set[i].chars[j][1]);
         } else {
-          regen.remove(set[i]['chars'][j][0]);
+          regen.remove(set[i].chars[j][0]);
         }
       }
     }
@@ -276,59 +342,10 @@ var regenerate = require('regenerate');
     return (parseFloat(number) | 0) === number;
   }
 
-  module.exports = {
-    /**
-     * Generates a string of the given length that include characters as defined
-     * by the given options.
-     *
-     * @param {Integer} length The length of the string to generate
-     * @param {Object} options An Object containing:
-     *  - include (optional) - An Object containing an Array of Objects, each of which contain:
-     *    - chars - An Array containing an Array of 1 character per index:
-     *      - 0 - A single character, hex character, or unicode character.
-     *        This may be a single character to include, or the beginning of a
-     *        range of characters to include
-     *      - 1 - A single character, hex character, or unicode character.
-     *        This must be the end of the range of the characters to include.
-     *    - min (optional) - An Integer representing the minimum number of
-     *      characters from the 'chars' set that *must* be included in the generated
-     *      string
-     *  - exclude (optional) - An Object containing an Array of Objects, each of which contain:
-     *    - chars - An Array containing an Array of 1 character per index:
-     *      - 0 - A single character, hex character, or unicode character.
-     *        This may be a single character to exclude, or the beginning of a
-     *        range of characters to exclude
-     *      - 1 - A single character, hex character, or unicode character.
-     *        This must be the end of the range of the characters to exclude.
-     * @returns {String} A random generated string
-     */
-    generate: function(length, options) {
-      if (!isInt(length)) {
-        throw new TypeError('Non-integer length type');
-      } else if (length < 0) {
-        throw new RangeError('Length must be a positive integer');
-      }
-
-      var opts = getOptions(options);
-      var allCharacters = getCharacterList(opts);
-
-      // Return no password if we have no data set to generate it from
-      var value = '';
-      if (allCharacters.length <= 0) {
-        return value;
-      }
-
-      // Generate random characters for the required minimum number of values
-      var characterSets = getCharacterSets(opts);
-      for (var i in characterSets) {
-        value += generateString(characterSets[i]['set'], characterSets[i]['min']);
-      }
-
-      // Generate random characters for the remainder of the length
-      value += generateString(allCharacters, (length - value.length));
-
-      return shuffle(value);
-    }
-  };
-}(this));
-
+  // Setup module for node/browser
+  if (typeof module !== undefined && module.exports) {
+    module.exports = passwordGenerator;
+  } else {
+    root.passwordGenerator = passwordGenerator;
+  }
+}).call(this);
