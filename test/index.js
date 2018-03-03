@@ -37,6 +37,34 @@ describe('#generate', function() {
     }
   });
 
+  it('generates password within BMP character range', function() {
+    var options = {
+      include: [
+        {chars: [[0x00]], min: 1},
+        {chars: [[0xFFFF]], min: 1},
+        {chars: [[97]], min: 1},
+        {chars: [['€']], min: 1},
+        {chars: [['ز']], min: 1},
+        {chars: [[0x1709]], min: 1},
+        {chars: [['⠧']], min: 1},
+        {chars: [['\u30B8']], min:1}
+      ]
+    };
+
+    var value = generator.generate(8, options);
+    value.should.lengthOf(8);
+
+    expect(value)
+      .to.match(/(?=.*[\u0000]).{1}/) // 0x00
+      .to.match(/(?=.*[\uFFFF]).{1}/) // 0xFFFF
+      .to.match(/(?=.*[a]).{1}/) // a
+      .to.match(/(?=.*[\u20AC]).{1}/) // €, (0x20AC) Euro symbol
+      .to.match(/(?=.*[\u0632]).{1}/) // ز, (0x0632) Arabic
+      .to.match(/(?=.*[\u1709]).{1}/) // ᜉ, (0x1709) Tagalog
+      .to.match(/(?=.*[\u2827]).{1}/) // ⠧, (0x2827) Braille
+      .to.match(/(?=.*[\u30B8]).{1}/); // ジ, (0x30B8) Katakana
+  });
+
   it('RangeError thrown when given negative length', function() {
     var lengths = [-1, -10, -1000];
     var options = {include: [{chars: [[0x41, 0x44]]}]};
@@ -57,114 +85,5 @@ describe('#generate', function() {
         function() { generator.generate(lengths[length], options); }
       ).to.throw(TypeError);
     }
-  });
-});
-
-describe('#getCharacterList', function() {
-  it('alphanumeric characters work', function() {
-    var options = {
-      include: [
-        {
-          chars: [
-            ['A', 'Z'],
-            ['0', '8']
-          ]
-        }
-      ],
-      exclude: [{chars: []}]
-    };
-
-    // There should be characters from A-Z and 0-8 in the list, but not 9
-    expect(
-      generator.getCharacterList(options)
-    ).to.deep.include.members([65,66,67,77,90,48,53,56]).not.include(57);
-
-    // The total number of characters should be 26 + 9 = 35
-    generator.getCharacterList(options).should.lengthOf(35);
-  });
-
-  it('decimal characters work', function() {
-    var options = {
-      include: [
-        {
-          chars: [
-            [50, 53],
-            [1000, 1002]
-          ]
-        }
-      ],
-      exclude: [
-        {
-          chars: [
-            ['3']
-          ]
-        }
-      ]
-    };
-
-    // There should be characters from 50-53 (digits 2 to 5), excluding 3,
-    // and 1000-1002 (cyrillic characters) in the list
-    expect(
-      generator.getCharacterList(options)
-    ).to.deep.include.members([50,52,53,1000,1001,1002]);
-
-  });
-
-  it('all included characters are set', function() {
-    // No values
-    expect(
-      generator.getCharacterList({include: [{chars: []}], exclude: [{chars: []}]})
-    ).to.be.an('array').that.is.empty;
-
-    // Unicode character 0x41 equates to decimal equivalent 65
-    expect(
-      generator.getCharacterList({include: [{chars: [[0x41]]}], exclude: [{chars: []}]})
-    ).to.deep.include(65);
-
-    // Unicode character range should include values in the middle
-    expect(
-      generator.getCharacterList({include: [{chars: [[0x41, 0x43]]}], exclude: [{chars: []}]})
-    ).to.deep.include.members([65,66,67]);
-
-    // Unicode character range should include values from multiple sets
-    expect(
-      generator.getCharacterList({include: [{chars: [[0x41, 0x43], [0x46]]}], exclude: [{chars: []}]})
-    ).to.deep.include.members([65,66,67,70]);
-  });
-
-  it('all excluded characters are removed', function() {
-    // No values
-    expect(
-      generator.getCharacterList({include: [{chars: [[0x41]]}], exclude: [{chars: [[0x41]]}]})
-    ).to.be.an('array').that.is.empty;
-
-    // Include a range but exclude a character in the middle of it
-    expect(
-      generator.getCharacterList({include: [{chars: [[0x41, 0x43]]}], exclude: [{chars: [[0x42]]}]})
-    ).to.deep.not.include(66);
-
-    // Exclude a range
-    expect(
-      generator.getCharacterList({include: [{chars: [[0x41, 0x43]]}], exclude: [{chars: [[0x41, 0x43]]}]})
-    ).to.be.empty;
-  });
-});
-
-describe('#isInt', function() {
-  it('integers are accepted', function() {
-    generator.isInt(-100).should.equal(true);
-    generator.isInt(-1).should.equal(true);
-    generator.isInt(0).should.equal(true);
-    generator.isInt(1).should.equal(true);
-    generator.isInt(100).should.equal(true);
-  });
-
-  it('non-integers are not accepted', function() {
-    generator.isInt('').should.equal(false);
-    generator.isInt('1').should.equal(false);
-    generator.isInt('test').should.equal(false);
-    generator.isInt({}).should.equal(false);
-    generator.isInt(3.14159).should.equal(false);
-    generator.isInt(null).should.equal(false);
   });
 });
