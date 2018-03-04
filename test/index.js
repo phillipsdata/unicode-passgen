@@ -49,6 +49,31 @@ describe('#generate', function() {
     }
   });
 
+  it('generates password respecting excluded character sets', function() {
+    // Exclude the only character
+    var options = {
+      include: [{chars: [['i']], min: 5}],
+      exclude: [{chars: [['i']]}]
+    };
+
+    generator.generate(10, options)
+      .should.lengthOf(0);
+
+    // If multiple characters exist and one is removed that has a min value
+    // ensure that it does not use the NUL byte as a character instead
+    options = {
+      include: [{chars: [['a', 'z']]}, {chars: [['i']], min: 5}],
+      exclude: [{chars: [['i']]}]
+    };
+
+    var value = generator.generate(10, options);
+
+    value.should.lengthOf(10);
+
+    expect(value)
+      .to.not.match(/(?=.*[\u0000]).{1,}/); // 0x00
+  });
+
   it('generates password within BMP character range', function() {
     var options = {
       include: [
@@ -79,7 +104,7 @@ describe('#generate', function() {
       .to.match(/(?=.*[\uD800]).{1}/); // 0xD800 High Surrogate
   });
 
-  it('fails to generate with characters outside of the BMP unicode range', function() {
+  it('fails to generate with characters outside of the BMP character range', function() {
     var options = {
       include: [
         {chars: [[0x10000]], min: 1}, // beginning of plane 1

@@ -4,9 +4,10 @@ var gulp = require('gulp'),
   streamify = require('gulp-streamify'),
   uglify = require('gulp-uglify'),
   rename = require('gulp-rename'),
+  name = 'unicode-passgen',
   buildDir = './dist',
-  buildFile = 'app.js',
-  buildMinFile = 'app.min.js',
+  buildFile = name + '.js',
+  buildMinFile = name + '.min.js',
   srcFile = './index.js';
 
 // Bundle the file
@@ -14,12 +15,12 @@ gulp.task('browserify', function() {
   var options = {
     cache: {},
     packageCache: {},
-    fullPaths: false,
-    standalone: 'unicode-passgen'
+    fullPaths: false
   };
 
   // Build the file and minified file
   return browserify(srcFile, options)
+    .require(srcFile, { expose: name})
     .bundle()
     .pipe(source(buildFile))
     .pipe(gulp.dest(buildDir))
