@@ -75,16 +75,6 @@
   };
 
   /**
-   * Avoid conflicts with module name
-   *
-   * @returns {Object}
-   */
-  unicodePassgen.noConflict = function() {
-    root.unicodePassgen = previousUnicodePassgen;
-    return unicodePassgen;
-  };
-
-  /**
    * Creates a set of options for the generator from the given options
    *
    * @param {Object} options An Object containing:

@@ -1218,13 +1218,13 @@ require=(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=
     typeof global == 'object' && global.global === global && global ||
     this ||
     {};
-  var previousPasswordGenerator = root.passwordGenerator;
-  var passwordGenerator = {};
+  var previousUnicodePassgen = root.unicodePassgen;
+  var unicodePassgen = {};
 
   // Be sure our dependencies exist
   var regenerate = root.regenerate || (typeof require !== undefined) && require('regenerate');
   if (!regenerate) {
-    throw new Error('passwordGenerator requires regenerate, see https://github.com/mathiasbynens/regenerate');
+    throw new Error('unicodePassgen requires regenerate, see https://github.com/mathiasbynens/regenerate');
   }
 
   /**
@@ -1252,7 +1252,7 @@ require=(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=
     *        This must be the end of the range of the characters to exclude.
     * @returns {String} A random generated string
     */
-  passwordGenerator.generate = function(length, options) {
+  unicodePassgen.generate = function(length, options) {
     if (!isInt(length)) {
       throw new TypeError('Non-integer length type');
     } else if (length < 0) {
@@ -1278,16 +1278,6 @@ require=(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=
     value += generateString(allCharacters, (length - value.length));
 
     return shuffle(value);
-  };
-
-  /**
-   * Avoid conflicts with module name
-   *
-   * @returns {Object}
-   */
-  passwordGenerator.noConflict = function() {
-    root.passwordGenerator = previousPasswordGenerator;
-    return passwordGenerator;
   };
 
   /**
@@ -1576,12 +1566,12 @@ require=(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=
   // Setup module for node/browser
   if (typeof exports !== undefined) {
     if (typeof module !== undefined && module.exports) {
-      module.exports = passwordGenerator;
+      module.exports = unicodePassgen;
     }
 
-    exports.passwordGenerator = passwordGenerator;
+    exports.unicodePassgen = unicodePassgen;
   } else {
-    root.passwordGenerator = passwordGenerator;
+    root.unicodePassgen = unicodePassgen;
   }
 }).call(this);
 

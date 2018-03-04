@@ -1,5 +1,5 @@
 # Unicode Password Generator
-[![Build Status](https://api.travis-ci.org/phillipsdata/unicode-passgen.svg)](http://travis-ci.org/phillipsdata/unicode-passgen) [![Dependency Status](https://david-dm.org/phillipsdata/unicode-passgen.svg)](https://david-dm.org/phillipsdata/unicode-passgen) [![Node Version](https://img.shields.io/npm/v/unicode-passgen.svg) ![Downloads](https://img.shields.io/npm/dm/unicode-passgen.svg)](https://www.npmjs.org/package/unicode-passgen)
+[![Build Status](https://api.travis-ci.org/phillipsdata/unicode-passgen.svg)](http://travis-ci.org/phillipsdata/unicode-passgen) [![Coverage Status](https://coveralls.io/repos/phillipsdata/unicode-passgen/badge.svg)](https://coveralls.io/r/phillipsdata/unicode-passgen) [![Dependency Status](https://david-dm.org/phillipsdata/unicode-passgen.svg)](https://david-dm.org/phillipsdata/unicode-passgen) [![Node Version](https://img.shields.io/npm/v/unicode-passgen.svg) ![Downloads](https://img.shields.io/npm/dm/unicode-passgen.svg)](https://www.npmjs.org/package/unicode-passgen)
 
 This password generator will generate a random string from a range of characters
 available in the

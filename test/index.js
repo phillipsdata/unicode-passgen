@@ -31,7 +31,7 @@ describe('#generate', function() {
         {chars: [['0', '5'], ['7']], min: 5}
       ],
       exclude: [
-        {chars: [['4']]}
+        {chars: [['3', '4']]}
       ]
     };
 
@@ -44,7 +44,7 @@ describe('#generate', function() {
       // The value *must* contain at least 2 of the characters and 5 digits
       expect(value)
         .to.match(/(?=.*[abcd]).{2,}/)
-        .to.match(/(?=.*[0-3,5,7]).{5,}/);
+        .to.match(/(?=.*[0-2,5,7]).{5,}/);
     }
   });
 
@@ -71,6 +71,26 @@ describe('#generate', function() {
 
     expect(value)
       .to.not.match(/(?=.*[\u0000]).{1,}/); // 0x00
+  });
+
+  it('skips invalid options', function() {
+    // Skip setting no characters on include/exclude
+    // and invalid properties (i.e. 'skip')
+    var options = {
+      include: [
+        {chars: [['a']], min: 5},
+        {chars: [[]], min: 2}
+      ],
+      exclude: [
+        {chars: [[]]}
+      ],
+      skip: 'this property should be ignored'
+    };
+
+    var value = generator.generate(5, options);
+
+    value.should.lengthOf(5);
+    expect(value).to.equal('aaaaa');
   });
 
   it('generates password within BMP character range', function() {
