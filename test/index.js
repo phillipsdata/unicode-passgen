@@ -1,6 +1,5 @@
 var chai = require('chai');
 var should = chai.should();
-var assert = chai.assert;
 var expect = chai.expect;
 var generator = require('../index');
 
