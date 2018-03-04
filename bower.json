@@ -17,11 +17,12 @@
     "browser"
   ],
   "homepage": "https://github.com/phillipsdata/unicode-passgen",
-  "private": true,
+  "private": false,
   "ignore": [
     "**/.*",
     "node_modules",
     "bower_components",
+    "coverage",
     "test",
     "tests"
   ]
