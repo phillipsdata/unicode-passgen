@@ -6,6 +6,9 @@
     "Phillips Data, Inc."
   ],
   "license": "MIT",
+  "moduleType": [
+    "node"
+  ],
   "keywords": [
     "unicode",
     "passgen",
