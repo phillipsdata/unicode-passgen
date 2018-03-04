@@ -109,7 +109,12 @@
    */
   function getOptions(options) {
     var opts = {
-      include: [],
+      include: [
+        {
+          chars: [[0x0000, 0xFFFF]],
+          min: 0
+        }
+      ],
       exclude: []
     };
 
@@ -118,6 +123,11 @@
       // Ignore options that are not in our opts set or are not an array
       if (!opts.hasOwnProperty(property) || !Array.isArray(options[property])) {
         continue;
+      }
+
+      // Reset the default value for this property since it's being overridden
+      if (property === 'include') {
+        opts.include = [];
       }
 
       // Merge the options given

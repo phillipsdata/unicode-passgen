@@ -1,0 +1,28 @@
+{
+  "name": "unicode-passgen",
+  "description": "A JavaScript library for generating random passwords from the Unicode BMP character set.",
+  "main": "index.js",
+  "authors": [
+    "Phillips Data, Inc."
+  ],
+  "license": "MIT",
+  "keywords": [
+    "unicode",
+    "passgen",
+    "password",
+    "generator",
+    "random",
+    "unicode",
+    "utf8",
+    "browser"
+  ],
+  "homepage": "https://github.com/phillipsdata/unicode-passgen",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

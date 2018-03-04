@@ -15,6 +15,15 @@ describe('#generate', function() {
     }
   });
 
+  it('generates password of expected length without options set', function() {
+    var lengths = [0, 1, 10, 1000];
+
+    for (var length in lengths) {
+      generator.generate(lengths[length])
+        .should.lengthOf(lengths[length]);
+    }
+  });
+
   it('generates password with expected minimum character lengths', function() {
     var lengths = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1000];
     var options = {
