@@ -1,6 +1,6 @@
 /**
  * Password Generator
- * https://github.com/phillipsdata/password-generator
+ * https://github.com/phillipsdata/unicode-passgen
  * Copyright (c) 2018 Phillips Data, Inc.
  * MIT License
  */

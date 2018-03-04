@@ -1,6 +1,6 @@
 {
-  "name": "password-generator",
-  "version": "0.2.0",
+  "name": "unicode-passgen",
+  "version": "1.0.0",
   "description": "A JavaScript library for generating random passwords from the Unicode BMP character set.",
   "main": "index.js",
   "directories": {
@@ -25,28 +25,30 @@
   "scripts": {
     "lint": "jshint index.js",
     "test": "mocha",
-    "build": "browserify index.js > dist/app.js",
-    "watch": "watchify index.js -o dist/app.js -dv"
+    "build": "gulp build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://tysonphillips@github.com/phillipsdata/password-generator.git"
+    "url": "git+https://tysonphillips@github.com/phillipsdata/unicode-passgen.git"
   },
   "keywords": [
+    "unicode passgen",
+    "unicode password",
+    "unicode password generator",
     "password generator",
     "generate password",
     "random string",
     "random generator",
     "password",
     "generator",
-    "javascript",
     "unicode",
+    "utf8",
     "browser"
   ],
   "author": "Phillips Data, Inc.",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/phillipsdata/password-generator/issues"
+    "url": "https://github.com/phillipsdata/unicode-passgen/issues"
   },
-  "homepage": "https://github.com/phillipsdata/password-generator#readme"
+  "homepage": "https://github.com/phillipsdata/unicode-passgen#readme"
 }

@@ -50,12 +50,13 @@ describe('#generate', function() {
         {chars: [['ز']], min: 1},
         {chars: [[0x1709]], min: 1},
         {chars: [['⠧']], min: 1},
-        {chars: [['\u30B8']], min:1}
+        {chars: [['\u30B8']], min:1},
+        {chars: [['\uD800']], min:1}
       ]
     };
 
-    var value = generator.generate(8, options);
-    value.should.lengthOf(8);
+    var value = generator.generate(9, options);
+    value.should.lengthOf(9);
 
     expect(value)
       .to.match(/(?=.*[\u0000]).{1}/) // 0x00
@@ -65,7 +66,8 @@ describe('#generate', function() {
       .to.match(/(?=.*[\u0632]).{1}/) // ز, (0x0632) Arabic
       .to.match(/(?=.*[\u1709]).{1}/) // ᜉ, (0x1709) Tagalog
       .to.match(/(?=.*[\u2827]).{1}/) // ⠧, (0x2827) Braille
-      .to.match(/(?=.*[\u30B8]).{1}/); // ジ, (0x30B8) Katakana
+      .to.match(/(?=.*[\u30B8]).{1}/) // ジ, (0x30B8) Katakana
+      .to.match(/(?=.*[\uD800]).{1}/); // 0xD800 High Surrogate
   });
 
   it('fails to generate with characters outside of the BMP unicode range', function() {
