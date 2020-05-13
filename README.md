@@ -83,7 +83,7 @@ this value is zero.
 
 ##### Pre-defined Character Options
 
-The following pre-defined works may be used in a `chars` array for convenience
+The following pre-defined words may be used in a `chars` array for convenience
 in defining common character sets. See below for an example.
 
 * `alpha` - Equivalent to `[['a', 'z'], ['A', 'Z']]`
