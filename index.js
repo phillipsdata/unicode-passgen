@@ -175,15 +175,17 @@
     for (var set in characters) {
       // Only a single set element should be given, e.g. ['alpha']
       // otherwise the entire set should not be translated
-      if (characters[set].length !== 1
-        || characters[set][0] === undefined
-        || !sets.hasOwnProperty(characters[set][0])
+      if (characters[set].length !== 1 ||
+        characters[set][0] === undefined ||
+        !sets.hasOwnProperty(characters[set][0])
       ) {
         newCharacters.push(characters[set]);
         continue;
       }
 
-      sets[characters[set][0]].map(val => newCharacters.push(val));
+      sets[characters[set][0]].map(function(val) {
+        return this.chars.push(val);
+      }, {chars: newCharacters});
     }
 
     return newCharacters;
