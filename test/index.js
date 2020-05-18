@@ -73,6 +73,57 @@ describe('#generate', function() {
       .to.not.match(/(?=.*[\u0000]).{1,}/); // 0x00
   });
 
+it('generates password with translated characters', function() {
+    var sets = [
+      {name: 'alpha', regex: /(?=.*[a-z])./i},
+      {name: 'alpha_lower', regex: /(?=.*[a-z])./},
+      {name: 'alpha_upper', regex: /(?=.*[A-Z])./},
+      {name: 'numeric', regex: /(?=.*[0-9])./},
+      {name: 'alpha_numeric', regex: /(?=.*[a-z0-9])./i},
+      {name: 'alpha_numeric_lower', regex: /(?=.*[a-z0-9])./},
+      {name: 'alpha_numeric_upper', regex: /(?=.*[A-Z0-9])./},
+      {name: 'symbols', regex: /(?=.*[!"#$%&\'\(\)\*\+\,\-\./:;<=>?@\[\\\]^_`\{\|\}~])./i}
+    ];
+
+    for (var obj in sets) {
+      var value = generator.generate(1000, {include: [{chars: [[sets[obj].name]]}]});
+      value.should.lengthOf(1000);
+
+      expect(value).to.match(sets[obj].regex);
+    }
+  });
+
+  it('generates password with mixed translated character options', function() {
+    var lengths = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1000];
+    var options = {
+      include: [
+        {chars: [['alpha_lower']], min: 2},
+        {chars: [['alpha_upper'], ['0', '7'], ['symbols']], min: 5},
+        {chars: [['q']], min: 3}
+      ],
+      exclude: [
+        {chars: [['3', '4'], ['6']]},
+        {chars: [['alpha_upper']]}
+      ]
+    };
+
+   for (var length in lengths) {
+      // The length should be the length of the sum of the character lengths or
+      // the total length provided, whichever is larger
+      var value = generator.generate(lengths[length], options);
+      value.should.lengthOf(Math.max(lengths[length], 10));
+
+      // The value *must* contain at least 2 of the characters, 5 digits,
+      // and 3 "q" characters
+      expect(value)
+        .to.match(/(?=.*[a-z]).{2,}/)
+        .to.match(/(?=.*([0-2]|5|7|[!"#$%&'\(\)\*\+\,\-\./:;<=>?@\[\\\]^_`\{\|\}~])).{5,}/)
+        .to.match(/(?=.*[q]).{3,}/)
+        .to.not.match(/(?=.*[A-Z].{1,})/)
+        .to.not.match(/(?=.*(3|4|6|8|9)).{1,}/);
+    }
+  });
+
   it('skips invalid options', function() {
     // Skip setting no characters on include/exclude
     // and invalid properties (i.e. 'skip')

@@ -66,6 +66,8 @@ of objects, each containing the `chars` property and an optional `min` property.
 
 The `chars` property defines an array of arrays representing a single character,
 or range of characters from a starting character to the ending character.
+A few pre-defined values may also be used for convenience, like `alpha_numeric`.
+See below for a list of valid pre-defined values.
 A range of characters must be set from a lower value to a higher value.
 For example, 'a' (hex 0x61, decimal 97) appears before
 'z' (hex 0x7A, decimal 122) in BMP, so the set should be provided `['a', 'z']`,
@@ -78,6 +80,22 @@ probability of appearing in the generated string relative to other characters.**
 The `min` property denotes that the defined character set group *must* have _at
 least_ that many characters represented in the generated string. By default,
 this value is zero.
+
+##### Pre-defined Character Options
+
+The following pre-defined words may be used in a `chars` array for convenience
+in defining common character sets. See below for an example.
+
+* `alpha` - Equivalent to `[['a', 'z'], ['A', 'Z']]`
+* `numeric` - Equivalent to `[['0', '9']]`
+* `alpha_numeric`- Equivalent to `[['a', 'z'], ['A', 'Z'], ['0', '9']]`
+* `symbols` - All lower-ASCII printable symbols, i.e. any of the following:
+    ``!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~``
+    Equivalent to `[[33, 47], [58, 64], [91, 96], [123, 126]]`
+* `alpha_lower` - Equivalent to `[['a', 'z']]`
+* `alpha_upper` - Equivalent to `[['A', 'Z']]`
+* `alpha_numeric_lower` - Equivalent to `[['a', 'z'], ['0', '9']]`
+* `alpha_numeric_upper` - Equivalent to `[['A', 'Z'], ['0', '9']]`
 
 ##### Syntax for `options`
 
@@ -100,6 +118,8 @@ var options = {
                 ...
                 [singleCharacter],
                 ...
+                [singlePredefinedValue],
+                ...
             ],
             min: integer
             ...
@@ -112,6 +132,8 @@ var options = {
                 [rangeStart [, rangeEnd]],
                 ...
                 [singleCharacter],
+                ...
+                [singlePredefinedValue],
                 ...
             ]
         },
@@ -138,13 +160,12 @@ var options = {
     include: [
         {
             chars: [
-                ['A', 'Z'],
-                ['a', 'z']
+                ['alpha']
             ]
         },
         {
             chars: [
-                ['0', '9']
+                ['numeric']
             ],
             min: 2
         },
@@ -201,7 +222,9 @@ unicodePassgen.generate(10, options); // ⚢㦴缔碅Χꂨ〱⁪㋃桷䳟껫
 ----
 
 Generate a random 10-character string from the Latin alphabet subset of
-lower-case characters from 'a' to 'z'
+lower-case characters from 'a' to 'z'.
+
+`[['a', 'z']]` is equivalent to `[['alpha_lower']]`
 
 ```javascript
 var options = {
@@ -218,6 +241,8 @@ unicodePassgen.generate(10, options); // sqxkhvjayd
 
 Generate a random 10-character string from the Latin alphabet subset of
 lower-case characters from 'a' to 'z', excluding 'i', 'j', 'k', 'l' and 'o'
+
+`[['a', 'z']]` is equivalent to `[['alpha_lower']]`
 
 ```javascript
 var options = {
@@ -240,6 +265,10 @@ unicodePassgen.generate(10, options); // aszvpwaeus
 Generate a random 10-character alphanumeric string where at least 8 digits must
 be present
 
+`[['a', 'z']]` is equivalent to `[['alpha_lower']]`
+
+`[['0', '9']]` is equivalent to `[['numeric']]`
+
 ```javascript
 var options = {
     include: [
@@ -259,6 +288,8 @@ unicodePassgen.generate(10, options); // 9fs9704187
 
 Generate a random 10-character string where at least 8 'f' characters are
 present
+
+`[['a', 'z']]` is equivalent to `[['alpha_lower']]`
 
 ```javascript
 var options = {
@@ -282,6 +313,8 @@ Generate a random 10-character string where at least 20 characters are digits.
 **Note that the required minimum values will override the provided length if
 they exceed it**
 
+`[['0', '9']]` is equivalent to `[['numeric']]`
+
 ```javascript
 var options = {
     include: [
@@ -301,6 +334,8 @@ character set (which also excludes the digit characters).
 
 **Note that excluding all of the included characters will cause an empty string
 to be returned by the generator**
+
+`[['0', '9']]` is equivalent to `[['numeric']]`
 
 ```javascript
 var options = {

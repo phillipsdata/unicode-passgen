@@ -1,4 +1,4 @@
-require=(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
+require=(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/regenerate v1.3.3 by @mathias | MIT license */
 ;(function(root) {
@@ -535,13 +535,21 @@ require=(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=
 		else if (codePoint == 0x0D) {
 			string = '\\r';
 		}
+		else if (codePoint == 0x2D) {
+			// https://mathiasbynens.be/notes/javascript-escapes#hexadecimal
+			// Note: `-` (U+002D HYPHEN-MINUS) is escaped in this way rather
+			// than by backslash-escaping, in case the output is used outside
+			// of a character class in a `u` RegExp. /\-/u throws, but
+			// /\x2D/u is fine.
+			string = '\\x2D';
+		}
 		else if (codePoint == 0x5C) {
 			string = '\\\\';
 		}
 		else if (
 			codePoint == 0x24 ||
 			(codePoint >= 0x28 && codePoint <= 0x2B) ||
-			(codePoint >= 0x2D && codePoint <= 0x2F) ||
+			codePoint == 0x2E || codePoint == 0x2F ||
 			codePoint == 0x3F ||
 			(codePoint >= 0x5B && codePoint <= 0x5E) ||
 			(codePoint >= 0x7B && codePoint <= 0x7D)
@@ -549,9 +557,10 @@ require=(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=
 			// The code point maps to an unsafe printable ASCII character;
 			// backslash-escape it. Here’s the list of those symbols:
 			//
-			//     $()*+-./?[\]^{|}
+			//     $()*+./?[\]^{|}
 			//
-			// See #7 for more info.
+			// This matches SyntaxCharacters as well as `/` (U+002F SOLIDUS).
+			// https://tc39.github.io/ecma262/#prod-SyntaxCharacter
 			string = '\\' + stringFromCharCode(codePoint);
 		}
 		else if (codePoint >= 0x20 && codePoint <= 0x7E) {
@@ -565,7 +574,6 @@ require=(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=
 			string = stringFromCharCode(codePoint);
 		}
 		else if (codePoint <= 0xFF) {
-			// https://mathiasbynens.be/notes/javascript-escapes#hexadecimal
 			string = '\\x' + pad(hex(codePoint), 2);
 		}
 		else { // `codePoint <= 0xFFFF` holds true.
@@ -1334,7 +1342,7 @@ require=(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=
         ) {
           // Add the character set to the options
           var charSet = {
-            chars: options[property][set].chars,
+            chars: translate(options[property][set].chars),
             min: 0
           };
 
@@ -1352,6 +1360,49 @@ require=(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=
     }
 
     return opts;
+  }
+
+  /**
+   * Translates a pre-defined set of words into their character groups, if set
+   *
+   * @param {Array} characters An Array of character sets
+   * @returns {Array} An array of character sets with predefined sets translated
+   */
+  function translate(characters)
+  {
+    var newCharacters = [];
+    var alpha_lower = ['a', 'z'];
+    var alpha_upper = ['A', 'Z'];
+    var numeric = ['0', '9'];
+    var sets = {
+      alpha: [alpha_lower, alpha_upper],
+      alpha_lower: [alpha_lower],
+      alpha_upper: [alpha_upper],
+      numeric: [numeric],
+      alpha_numeric: [alpha_lower, alpha_upper, numeric],
+      alpha_numeric_lower: [alpha_lower, numeric],
+      alpha_numeric_upper: [alpha_upper, numeric],
+      // ASCII printable symbols
+      symbols: [[33, 47], [58, 64], [91, 96], [123, 126]]
+    };
+
+    for (var set in characters) {
+      // Only a single set element should be given, e.g. ['alpha']
+      // otherwise the entire set should not be translated
+      if (characters[set].length !== 1 ||
+        characters[set][0] === undefined ||
+        !sets.hasOwnProperty(characters[set][0])
+      ) {
+        newCharacters.push(characters[set]);
+        continue;
+      }
+
+      sets[characters[set][0]].map(function(val) {
+        return this.chars.push(val);
+      }, {chars: newCharacters});
+    }
+
+    return newCharacters;
   }
 
   /**
@@ -1553,7 +1604,7 @@ require=(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=
    * Checks whether the given number is an Integer
    *
    * @param {Mixed} number The value to check
-   * @returns {Boolean} The
+   * @returns {Boolean} Whether the number is an Integer
    */
   function isInt(number) {
     if (isNaN(number)) {

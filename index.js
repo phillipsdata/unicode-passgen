@@ -128,7 +128,7 @@
         ) {
           // Add the character set to the options
           var charSet = {
-            chars: options[property][set].chars,
+            chars: translate(options[property][set].chars),
             min: 0
           };
 
@@ -146,6 +146,49 @@
     }
 
     return opts;
+  }
+
+  /**
+   * Translates a pre-defined set of words into their character groups, if set
+   *
+   * @param {Array} characters An Array of character sets
+   * @returns {Array} An array of character sets with predefined sets translated
+   */
+  function translate(characters)
+  {
+    var newCharacters = [];
+    var alpha_lower = ['a', 'z'];
+    var alpha_upper = ['A', 'Z'];
+    var numeric = ['0', '9'];
+    var sets = {
+      alpha: [alpha_lower, alpha_upper],
+      alpha_lower: [alpha_lower],
+      alpha_upper: [alpha_upper],
+      numeric: [numeric],
+      alpha_numeric: [alpha_lower, alpha_upper, numeric],
+      alpha_numeric_lower: [alpha_lower, numeric],
+      alpha_numeric_upper: [alpha_upper, numeric],
+      // ASCII printable symbols
+      symbols: [[33, 47], [58, 64], [91, 96], [123, 126]]
+    };
+
+    for (var set in characters) {
+      // Only a single set element should be given, e.g. ['alpha']
+      // otherwise the entire set should not be translated
+      if (characters[set].length !== 1 ||
+        characters[set][0] === undefined ||
+        !sets.hasOwnProperty(characters[set][0])
+      ) {
+        newCharacters.push(characters[set]);
+        continue;
+      }
+
+      sets[characters[set][0]].map(function(val) {
+        return this.chars.push(val);
+      }, {chars: newCharacters});
+    }
+
+    return newCharacters;
   }
 
   /**
@@ -347,7 +390,7 @@
    * Checks whether the given number is an Integer
    *
    * @param {Mixed} number The value to check
-   * @returns {Boolean} The
+   * @returns {Boolean} Whether the number is an Integer
    */
   function isInt(number) {
     if (isNaN(number)) {
